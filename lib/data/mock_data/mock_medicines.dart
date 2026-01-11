@@ -35,8 +35,8 @@ class MockMedicines {
       imageUrl: 'https://picsum.photos/200/200?random=3',
       description: 'Relief from cough and cold symptoms',
       manufacturer: 'HealthCare Labs',
-      prescriptionRequired: false,
-      inStock: true,
+      requiresPrescription: false,
+      stock: 100,
     ),
     Medicine(
       id: '4',
@@ -89,7 +89,7 @@ class MockMedicines {
   }
 
   static List<Medicine> getInStockMedicines() {
-    return medicines.where((medicine) => medicine.inStock).toList();
+    return medicines.where((medicine) => medicine.isInStock).toList();
   }
 
   static List<Medicine> searchMedicines(String query) {
@@ -97,7 +97,7 @@ class MockMedicines {
     return medicines
         .where((medicine) =>
             medicine.name.toLowerCase().contains(lowerQuery) ||
-            medicine.description.toLowerCase().contains(lowerQuery))
+            (medicine.description?.toLowerCase().contains(lowerQuery) ?? false));
         .toList();
   }
 }

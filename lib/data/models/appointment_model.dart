@@ -1,22 +1,23 @@
-/// Appointment model
+/// Production-grade Appointment Model
 class Appointment {
   final String id;
-  final String patientId;
-  final String doctorId;
+  final String? patientId;
+  final String? doctorId;
   final String doctorName;
   final String? doctorImage;
   final String specialty;
   final DateTime date;
   final String time;
-  final String type;
-  final String status;
-  final double amount;
+  final String type; // 'video', 'clinic', 'home'
+  final String status; // 'upcoming', 'completed', 'cancelled'
+  final double fee;
   final String? notes;
+  final DateTime? createdAt;
 
   Appointment({
     required this.id,
-    required this.patientId,
-    required this.doctorId,
+    this.patientId,
+    this.doctorId,
     required this.doctorName,
     this.doctorImage,
     required this.specialty,
@@ -24,24 +25,32 @@ class Appointment {
     required this.time,
     required this.type,
     required this.status,
-    required this.amount,
+    required this.fee,
     this.notes,
+    this.createdAt,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
     return Appointment(
       id: json['id']?.toString() ?? '',
-      patientId: json['patientId']?.toString() ?? '',
-      doctorId: json['doctorId']?.toString() ?? '',
+      patientId: json['patientId']?.toString(),
+      doctorId: json['doctorId']?.toString(),
       doctorName: json['doctorName'] ?? '',
       doctorImage: json['doctorImage'],
       specialty: json['specialty'] ?? '',
-      date: DateTime.parse(json['date']),
+      date: json['date'] is String
+          ? DateTime.parse(json['date'])
+          : json['date'] as DateTime,
       time: json['time'] ?? '',
-      type: json['type'] ?? 'consultation',
-      status: json['status'] ?? 'pending',
-      amount: (json['amount'] ?? 0).toDouble(),
+      type: json['type'] ?? 'video',
+      status: json['status'] ?? 'upcoming',
+      fee: (json['fee'] ?? json['amount'] ?? 0).toDouble(),
       notes: json['notes'],
+      createdAt: json['createdAt'] != null
+          ? (json['createdAt'] is String
+              ? DateTime.parse(json['createdAt'])
+              : json['createdAt'] as DateTime)
+          : null,
     );
   }
 
@@ -57,8 +66,9 @@ class Appointment {
       'time': time,
       'type': type,
       'status': status,
-      'amount': amount,
+      'fee': fee,
       'notes': notes,
+      'createdAt': createdAt?.toIso8601String(),
     };
   }
 
@@ -73,8 +83,9 @@ class Appointment {
     String? time,
     String? type,
     String? status,
-    double? amount,
+    double? fee,
     String? notes,
+    DateTime? createdAt,
   }) {
     return Appointment(
       id: id ?? this.id,
@@ -87,8 +98,13 @@ class Appointment {
       time: time ?? this.time,
       type: type ?? this.type,
       status: status ?? this.status,
-      amount: amount ?? this.amount,
+      fee: fee ?? this.fee,
       notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  bool get isUpcoming => status == 'upcoming' && date.isAfter(DateTime.now());
+  bool get isCompleted => status == 'completed';
+  bool get isCancelled => status == 'cancelled';
 }

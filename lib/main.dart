@@ -7,12 +7,15 @@ import 'package:sizer/sizer.dart';
 import 'core/theme/app_theme.dart';
 import 'core/routes/app_routes.dart';
 
-// Providers
+// Providers - Legacy (to be migrated)
 import 'core/providers/app_state_provider.dart';
-import 'core/providers/doctors_provider.dart';
-import 'core/providers/appointments_provider.dart';
-import 'core/providers/pharmacy_provider.dart';
-import 'core/providers/booking_provider.dart';
+
+// New Production-Grade Controllers
+import 'core/controllers/booking_controller.dart';
+import 'features/appointments/controllers/appointment_controller.dart';
+import 'features/doctors/controllers/doctors_controller.dart';
+import 'features/pharmacy/controllers/pharmacy_controller.dart';
+import 'features/payment/controllers/payment_controller.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,14 +48,25 @@ class DhanvantriApp extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return MultiProvider(
           providers: [
-            // App State Provider (Authentication & User Data)
+            // ========== AUTHENTICATION & APP STATE ==========
             ChangeNotifierProvider(create: (_) => AppStateProvider()),
 
-            // Feature Providers
-            ChangeNotifierProvider(create: (_) => DoctorsProvider()),
-            ChangeNotifierProvider(create: (_) => AppointmentsProvider()),
-            ChangeNotifierProvider(create: (_) => PharmacyProvider()),
-            ChangeNotifierProvider(create: (_) => BookingProvider()),
+            // ========== PRODUCTION-GRADE CONTROLLERS ==========
+
+            // Booking Management
+            ChangeNotifierProvider(create: (_) => BookingController()),
+
+            // Appointments Management
+            ChangeNotifierProvider(create: (_) => AppointmentController()),
+
+            // Doctors Management
+            ChangeNotifierProvider(create: (_) => DoctorsController()),
+
+            // Pharmacy Management
+            ChangeNotifierProvider(create: (_) => PharmacyController()),
+
+            // Payment Management
+            ChangeNotifierProvider(create: (_) => PaymentController()),
           ],
           child: MaterialApp(
             title: 'Dhanvantri Healthcare',
