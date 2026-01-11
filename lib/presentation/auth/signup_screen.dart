@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/app_export.dart';
-import '../../core/routes/app_routes.dart';
 
 /// Signup Screen for new users
 /// Redirects to FEED page after successful signup

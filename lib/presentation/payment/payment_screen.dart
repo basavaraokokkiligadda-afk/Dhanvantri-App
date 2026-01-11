@@ -71,6 +71,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _showPaymentSuccessDialog() {
+    final orderDetails = widget.orderDetails;
+    final appointmentId = orderDetails['appointmentId'] ??
+        'APT${DateTime.now().millisecondsSinceEpoch}';
+    final transactionId = 'TXN${DateTime.now().millisecondsSinceEpoch}';
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -108,25 +113,107 @@ class _PaymentScreenState extends State<PaymentScreen> {
               style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 16),
-            Text(
-              'Transaction ID: TXN${DateTime.now().millisecondsSinceEpoch}',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
+            if (widget.type == 'appointment') ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Booking ID:',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Text(
+                          appointmentId,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Transaction ID:',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Text(
+                          transactionId,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+            ] else ...[
+              Text(
+                'Transaction ID: $transactionId',
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
           ],
         ),
         actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                // Close dialog and navigate back to dashboard
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context)
-                    .popUntil((route) => route.isFirst); // Go to dashboard
-              },
-              child: const Text('Done'),
+          if (widget.type == 'appointment') ...[
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  Navigator.of(context)
+                      .popUntil((route) => route.isFirst); // Go to dashboard
+                },
+                child: const Text('Go to Dashboard'),
+              ),
             ),
-          ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  // Navigate to appointments history
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    Navigator.pushNamed(context, AppRoutes.appointmentsHistory);
+                  });
+                },
+                child: const Text('View My Appointments'),
+              ),
+            ),
+          ] else ...[
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  Navigator.of(context)
+                      .popUntil((route) => route.isFirst); // Go to dashboard
+                },
+                child: const Text('Done'),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -199,83 +286,87 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                ...paymentMethods.map((method) {
-                  final isSelected = selectedPaymentMethod == method['id'];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    elevation: isSelected ? 4 : 1,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: isSelected
-                            ? theme.primaryColor
-                            : Colors.transparent,
-                        width: 2,
-                      ),
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          selectedPaymentMethod = method['id'];
-                        });
-                        HapticFeedback.lightImpact();
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color:
-                                    theme.primaryColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                method['icon'],
-                                color: theme.primaryColor,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    method['name'],
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    method['subtitle'],
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Radio<String>(
-                              value: method['id'],
-                              groupValue: selectedPaymentMethod,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedPaymentMethod = value;
-                                });
-                                HapticFeedback.lightImpact();
-                              },
-                            ),
-                          ],
+                RadioGroup<String>(
+                  groupValue: selectedPaymentMethod,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedPaymentMethod = value;
+                      });
+                      HapticFeedback.lightImpact();
+                    }
+                  },
+                  child: Column(
+                    children: paymentMethods.map((method) {
+                      final isSelected = selectedPaymentMethod == method['id'];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        elevation: isSelected ? 4 : 1,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: isSelected
+                                ? theme.primaryColor
+                                : Colors.transparent,
+                            width: 2,
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                }),
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedPaymentMethod = method['id'];
+                            });
+                            HapticFeedback.lightImpact();
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: theme.primaryColor
+                                        .withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    method['icon'],
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        method['name'],
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        method['subtitle'],
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
               ],
             ),
           ),

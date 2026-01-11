@@ -23,11 +23,13 @@ import '../../presentation/diagnostic/diagnostic_center_details_screen.dart';
 import '../../presentation/blood/blood_centers_screen.dart';
 import '../../presentation/blood/blood_bank_details_screen.dart';
 import '../../presentation/booking/unified_booking_screen.dart';
+import '../../presentation/booking/booking_options_screen.dart';
 import '../../presentation/appointment/appointment_summary_screen.dart';
 import '../../presentation/payment/payment_screen.dart';
 import '../../presentation/appointment/appointments_history_screen.dart';
 import '../../presentation/appointment/appointment_details_screen.dart';
 import '../../presentation/appointment/ambulance_booking_screen.dart';
+import '../../presentation/appointment/ambulance_tracking_screen.dart';
 import '../../presentation/appointment/medicine_order_details_screen.dart';
 
 class AppRoutes {
@@ -57,12 +59,14 @@ class AppRoutes {
   static const String bloodCenters = '/blood-centers';
   static const String bloodBankDetails = '/blood-bank-details';
   static const String unifiedBooking = '/unified-booking';
+  static const String bookingOptions = '/booking-options';
   static const String appointmentSummary = '/appointment-summary';
   static const String payment = '/payment';
   static const String pharmacyCheckout = '/pharmacy-checkout';
   static const String appointmentsHistory = '/appointments-history';
   static const String appointmentDetails = '/appointment-details';
   static const String ambulanceBooking = '/ambulance-booking';
+  static const String ambulanceTracking = '/ambulance-tracking';
   static const String medicineOrderDetails = '/medicine-order-details';
 
   // Route map
@@ -114,6 +118,7 @@ class AppRoutes {
           data: args['data'],
         );
       },
+      bookingOptions: (context) => const BookingOptionsScreen(),
       appointmentSummary: (context) {
         final args =
             ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -144,6 +149,11 @@ class AppRoutes {
         final appointment =
             ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
         return AmbulanceBookingScreen(appointment: appointment);
+      },
+      ambulanceTracking: (context) {
+        final bookingDetails =
+            ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+        return AmbulanceTrackingScreen(bookingDetails: bookingDetails);
       },
       medicineOrderDetails: (context) => const MedicineOrderDetailsScreen(),
     };

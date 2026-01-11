@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/app_export.dart';
-import '../../core/routes/app_routes.dart';
 import '../widgets/ai_assistant_popup.dart';
 
 /// Hospital Dashboard - Full page without bottom navigation
@@ -526,10 +524,9 @@ class HospitalDashboardState extends State<HospitalDashboard>
                 icon: Icons.event_note,
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Opening ambulance & medicine bookings...'),
-                    ),
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.bookingOptions,
                   );
                 },
               ),
@@ -550,7 +547,7 @@ class HospitalDashboardState extends State<HospitalDashboard>
                 icon: Icons.calendar_today,
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  Navigator.pushNamed(context, AppRoutes.appointment);
+                  Navigator.pushNamed(context, AppRoutes.appointmentsHistory);
                 },
               ),
             ),

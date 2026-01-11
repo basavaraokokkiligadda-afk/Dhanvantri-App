@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/app_export.dart';
-import '../../core/routes/app_routes.dart';
 
 /// Doctor Profile Screen - Detailed doctor information with booking
 class DoctorProfileScreen extends StatelessWidget {

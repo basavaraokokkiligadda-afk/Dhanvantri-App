@@ -28,6 +28,9 @@ class _FeedCardWidgetState extends State<FeedCardWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _likeAnimationController;
   late Animation<double> _likeAnimation;
+  bool _hasDonated = false;
+  int? _selectedAmount;
+  final TextEditingController _customAmountController = TextEditingController();
 
   @override
   void initState() {
@@ -47,6 +50,7 @@ class _FeedCardWidgetState extends State<FeedCardWidget>
   @override
   void dispose() {
     _likeAnimationController.dispose();
+    _customAmountController.dispose();
     super.dispose();
   }
 
@@ -63,6 +67,150 @@ class _FeedCardWidgetState extends State<FeedCardWidget>
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => _buildContextMenu(),
+    );
+  }
+
+  void _showDonationSheet() {
+    HapticFeedback.mediumImpact();
+    setState(() {
+      _selectedAmount = null;
+      _customAmountController.clear();
+    });
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => _buildDonationSheet(),
+    );
+  }
+
+  void _processDonation() {
+    final amount =
+        _selectedAmount ?? (int.tryParse(_customAmountController.text) ?? 0);
+
+    if (amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select or enter a valid amount')),
+      );
+      return;
+    }
+
+    Navigator.pop(context); // Close donation sheet
+
+    // Show success dialog
+    _showDonationSuccess(amount);
+  }
+
+  void _showDonationSuccess(int amount) {
+    final donationId = 'DON${DateTime.now().millisecondsSinceEpoch}';
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 64,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Thank you for your support ❤️',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Donated Amount:'),
+                      Text(
+                        '₹$amount',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Donation ID:'),
+                      Text(
+                        donationId.substring(0, 16),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Status:'),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'Successful',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() => _hasDonated = true);
+                Navigator.pop(context);
+              },
+              child: const Text('Done'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -145,6 +293,18 @@ class _FeedCardWidgetState extends State<FeedCardWidget>
                         ),
                       ],
                     ),
+                  ),
+                  // Donate Heart Icon
+                  IconButton(
+                    onPressed: _showDonationSheet,
+                    icon: Icon(
+                      _hasDonated ? Icons.favorite : Icons.favorite_border,
+                      color: _hasDonated
+                          ? const Color(0xFFDC2626)
+                          : theme.colorScheme.onSurfaceVariant,
+                      size: 24,
+                    ),
+                    tooltip: 'Donate',
                   ),
                   IconButton(
                     onPressed: _showContextMenu,
@@ -376,11 +536,195 @@ class _FeedCardWidgetState extends State<FeedCardWidget>
               ),
               onTap: () {
                 Navigator.pop(context);
-                widget.onContextMenu('hide');
+                widget.onContextMenu('hide_user');
               },
             ),
-            const SizedBox(height: 8),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDonationSheet() {
+    final theme = Theme.of(context);
+    final predefinedAmounts = [50, 100, 250, 500];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle bar
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: theme.dividerColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+
+                // Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.favorite,
+                        color: Color(0xFFDC2626),
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Donate',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // Message
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Text(
+                    'Support this cause by donating',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Predefined amounts
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: predefinedAmounts.map((amount) {
+                      final isSelected = _selectedAmount == amount;
+                      return ChoiceChip(
+                        label: Text('₹$amount'),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedAmount = selected ? amount : null;
+                            if (selected) {
+                              _customAmountController.clear();
+                            }
+                          });
+                        },
+                        selectedColor:
+                            theme.primaryColor.withValues(alpha: 0.2),
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? theme.primaryColor
+                              : theme.colorScheme.onSurface,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                        ),
+                        side: BorderSide(
+                          color: isSelected
+                              ? theme.primaryColor
+                              : theme.dividerColor,
+                          width: isSelected ? 2 : 1,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Custom amount input
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Or enter custom amount',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _customAmountController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          hintText: 'Enter amount',
+                          prefixText: '₹ ',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                        ),
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            setState(() => _selectedAmount = null);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Donate button
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _processDonation,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.favorite),
+                          SizedBox(width: 8),
+                          Text(
+                            'Donate Now',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
         ),
       ),
     );

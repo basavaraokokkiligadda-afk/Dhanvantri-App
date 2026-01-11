@@ -115,42 +115,71 @@ class _UnifiedBookingScreenState extends State<UnifiedBookingScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Book Appointment'),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Booking Details Section
-            _buildBookingDetailsCard(theme),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Booking Details Section
+              _buildBookingDetailsCard(theme),
 
-            // Date Selection
-            _buildDateSelectionCard(theme),
+              // Date Selection
+              _buildDateSelectionCard(theme),
 
-            // Time Slot Selection
-            if (selectedDate != null) _buildTimeSlotCard(theme),
+              // Time Slot Selection
+              if (selectedDate != null) _buildTimeSlotCard(theme),
 
-            // Patient Details Form
-            if (selectedTimeSlot != null) _buildPatientDetailsCard(theme),
+              // Patient Details Form
+              if (selectedTimeSlot != null) _buildPatientDetailsCard(theme),
 
-            // Confirmation Section
-            if (_formKey.currentState != null &&
-                selectedDate != null &&
-                selectedTimeSlot != null)
-              _buildConfirmationCard(theme),
+              // Confirmation Section (Booking Summary)
+              if (_formKey.currentState != null &&
+                  selectedDate != null &&
+                  selectedTimeSlot != null)
+                _buildConfirmationCard(theme),
 
-            const SizedBox(height: 100), // Space for floating button
-          ],
+              // Spacing before Confirm Button
+              if (_canConfirmBooking()) const SizedBox(height: 24),
+
+              // Confirm Button (scrollable, inside the content)
+              if (_canConfirmBooking())
+                ElevatedButton(
+                  onPressed: _confirmBooking,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle),
+                      SizedBox(width: 8),
+                      Text(
+                        'Confirm Booking',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              // Bottom spacing
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
-      floatingActionButton: _canConfirmBooking()
-          ? FloatingActionButton.extended(
-              onPressed: _confirmBooking,
-              icon: const Icon(Icons.check_circle),
-              label: const Text('Confirm Booking'),
-            )
-          : null,
     );
   }
 
@@ -531,7 +560,7 @@ class _UnifiedBookingScreenState extends State<UnifiedBookingScreen> {
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

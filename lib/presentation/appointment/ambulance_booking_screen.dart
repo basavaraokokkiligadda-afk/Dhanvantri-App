@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/routes/app_routes.dart';
 
 /// Ambulance Booking Screen
 /// Allows users to book ambulance service for their appointments
@@ -20,11 +21,16 @@ class _AmbulanceBookingScreenState extends State<AmbulanceBookingScreen> {
   final List<Map<String, dynamic>> _ambulanceTypes = [
     {
       'name': 'Basic Life Support (BLS)',
+      'description': 'For stable patients needing basic medical support',
+      'usage': 'General transport, minor injuries',
       'price': 500,
       'features': ['Oxygen Support', 'First Aid Kit', 'Trained Staff'],
+      'icon': Icons.local_hospital,
     },
     {
       'name': 'Advanced Life Support (ALS)',
+      'description': 'Critical care with advanced medical equipment',
+      'usage': 'Serious conditions, post-surgery',
       'price': 1200,
       'features': [
         'Ventilator',
@@ -32,11 +38,59 @@ class _AmbulanceBookingScreenState extends State<AmbulanceBookingScreen> {
         'Defibrillator',
         'Emergency Medications'
       ],
+      'icon': Icons.medical_services,
     },
     {
-      'name': 'Patient Transport (Non-Emergency)',
-      'price': 300,
-      'features': ['Wheelchair Access', 'Comfortable Seating', 'Basic Care'],
+      'name': 'ICU Ambulance',
+      'description': 'Mobile ICU with life support systems',
+      'usage': 'Critical patients, inter-hospital transfer',
+      'price': 2500,
+      'features': [
+        'Portable ICU Setup',
+        'Ventilator',
+        'Multiple Monitors',
+        'Critical Care Specialist'
+      ],
+      'icon': Icons.emergency,
+    },
+    {
+      'name': 'Pregnancy Care Ambulance',
+      'description': 'Specialized for expectant mothers',
+      'usage': 'Labor emergencies, prenatal care',
+      'price': 800,
+      'features': [
+        'Gynecologist Support',
+        'Delivery Equipment',
+        'Neonatal Care Kit',
+        'Female Paramedics'
+      ],
+      'icon': Icons.pregnant_woman,
+    },
+    {
+      'name': 'Accident / Trauma Ambulance',
+      'description': 'Rapid response for accident victims',
+      'usage': 'Road accidents, trauma injuries',
+      'price': 1500,
+      'features': [
+        'Trauma Kit',
+        'Spinal Boards',
+        'Advanced Monitoring',
+        'Paramedic Team'
+      ],
+      'icon': Icons.car_crash,
+    },
+    {
+      'name': 'Cardiac Emergency Ambulance',
+      'description': 'Specialized cardiac care unit',
+      'usage': 'Heart attacks, cardiac emergencies',
+      'price': 1800,
+      'features': [
+        'ECG Machine',
+        'Defibrillator',
+        'Cardiac Medications',
+        'Cardiologist on Call'
+      ],
+      'icon': Icons.favorite,
     },
   ];
 
@@ -132,16 +186,28 @@ class _AmbulanceBookingScreenState extends State<AmbulanceBookingScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context); // Close dialog
-              Navigator.pop(context); // Go back
+              Navigator.pop(context); // Go back to previous screen
             },
-            child: const Text('Track Ambulance'),
+            child: const Text('Done'),
           ),
           ElevatedButton(
             onPressed: () {
+              final bookingId =
+                  'AMB${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
               Navigator.pop(context); // Close dialog
-              Navigator.pop(context); // Go back
+              Navigator.pushNamed(
+                context,
+                AppRoutes.ambulanceTracking,
+                arguments: {
+                  'ambulanceType': _selectedAmbulanceType,
+                  'bookingId': bookingId,
+                  'pickup': _pickupController.text,
+                  'drop': _dropController.text,
+                  'isEmergency': _isEmergency,
+                },
+              );
             },
-            child: const Text('Done'),
+            child: const Text('Track Ambulance'),
           ),
         ],
       ),
@@ -231,9 +297,21 @@ class _AmbulanceBookingScreenState extends State<AmbulanceBookingScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            ..._ambulanceTypes.map((type) {
-              return _buildAmbulanceTypeCard(type, theme);
-            }),
+            RadioGroup<String>(
+              groupValue: _selectedAmbulanceType,
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedAmbulanceType = value;
+                  });
+                }
+              },
+              child: Column(
+                children: _ambulanceTypes.map((type) {
+                  return _buildAmbulanceTypeCard(type, theme);
+                }).toList(),
+              ),
+            ),
             const SizedBox(height: 24),
 
             // Price Summary
@@ -364,14 +442,20 @@ class _AmbulanceBookingScreenState extends State<AmbulanceBookingScreen> {
         ),
         child: Row(
           children: [
-            Radio<String>(
-              value: type['name'],
-              groupValue: _selectedAmbulanceType,
-              onChanged: (value) {
-                setState(() {
-                  _selectedAmbulanceType = value!;
-                });
-              },
+            // Icon
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? theme.primaryColor
+                    : theme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                type['icon'] ?? Icons.local_hospital,
+                color: isSelected ? Colors.white : theme.primaryColor,
+                size: 28,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -387,36 +471,58 @@ class _AmbulanceBookingScreenState extends State<AmbulanceBookingScreen> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 4,
-                    children: (type['features'] as List).map((feature) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          feature,
-                          style: const TextStyle(fontSize: 11),
-                        ),
-                      );
-                    }).toList(),
+                  Text(
+                    type['description'] ?? '',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '💡 ${type['usage'] ?? ''}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: theme.primaryColor,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                 ],
               ),
             ),
-            Text(
-              '₹${type['price']}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: isSelected ? theme.primaryColor : Colors.black,
-              ),
+            Column(
+              children: [
+                Text(
+                  '₹${type['price']}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: isSelected ? theme.primaryColor : Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (isSelected)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Selected',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),

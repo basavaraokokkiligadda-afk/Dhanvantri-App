@@ -1,5 +1,4 @@
 import '../../core/app_export.dart';
-import '../../core/routes/app_routes.dart';
 import '../widgets/category_tab_widget.dart';
 import '../widgets/filter_bottom_sheet_widget.dart';
 import '../widgets/medicine_card_widget.dart';

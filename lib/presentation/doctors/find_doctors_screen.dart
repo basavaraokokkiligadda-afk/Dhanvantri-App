@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../core/app_export.dart';
-import '../../core/routes/app_routes.dart';
 
 /// Find Doctors Screen - Professional doctor listing platform
 class FindDoctorsScreen extends StatefulWidget {
