@@ -1,0 +1,74 @@
+name: dhanvantri_healthcare
+description: A comprehensive healthcare mobile application built with Flutter
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI & Design
+  cupertino_icons: ^1.0.6
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.9
+
+  # State Management
+  provider: ^6.1.1
+  get: ^4.6.6
+
+  # Routing
+  go_router: ^13.0.0
+
+  # Network & API
+  http: ^1.1.2
+  dio: ^5.4.0
+
+  # Local Storage
+  shared_preferences: ^2.2.2
+
+  # Media
+  image_picker: ^1.0.7
+  cached_network_image: ^3.3.1
+  video_player: ^2.8.2
+
+  # Audio (for AI assistant)
+  audio_waveforms: ^1.0.5
+  record: ^5.0.4
+  permission_handler: ^11.2.0
+
+  # Animations
+  lottie: ^3.0.0
+
+  # UI Utilities
+  sizer: ^2.0.15
+  intl: ^0.19.0
+
+  # Additional UI Components
+  table_calendar: ^3.0.9
+  pinput: ^3.0.1
+  file_picker: ^6.1.1
+  animated_digit: ^3.0.1
+  flutter_slidable: ^3.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
