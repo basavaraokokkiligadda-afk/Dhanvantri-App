@@ -28,6 +28,17 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Chrome/Browser Runtime (Development)
+**/chrome/
+**/browser/
+**/.chrome/
+
+# Local cache and logs
+*.cache
+*.tmp
+coverage/
+test/.test_coverage.dart
+
 # Symbolication related
 app.*.symbols
 
