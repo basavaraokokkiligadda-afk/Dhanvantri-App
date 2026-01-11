@@ -71,7 +71,7 @@ class BookingProvider extends ChangeNotifier {
   /// Get consultation fee
   double getConsultationFee() {
     if (_selectedDoctor != null) {
-      return _selectedDoctor!.consultationFee;
+      return _selectedDoctor!.fee;
     } else if (_selectedEntity != null && _selectedEntity!['fee'] != null) {
       return (_selectedEntity!['fee'] as num).toDouble();
     }

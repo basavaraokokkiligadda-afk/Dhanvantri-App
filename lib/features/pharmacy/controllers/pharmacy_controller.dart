@@ -85,7 +85,7 @@ class PharmacyController extends ChangeNotifier {
       final matchesSearch = _searchQuery.isEmpty ||
           medicine.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           (medicine.description
-                  .toLowerCase()
+                  ?.toLowerCase()
                   .contains(_searchQuery.toLowerCase()) ??
               false);
 

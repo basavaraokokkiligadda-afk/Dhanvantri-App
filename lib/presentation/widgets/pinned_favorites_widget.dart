@@ -79,12 +79,13 @@ class PinnedFavoritesWidget extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Stack(
               children: [
                 Container(
-                  width: 56,
-                  height: 56,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
@@ -106,8 +107,8 @@ class PinnedFavoritesWidget extends StatelessWidget {
                     child: ClipOval(
                       child: CustomImageWidget(
                         imageUrl: favorite["avatar"] as String,
-                        width: 52,
-                        height: 52,
+                        width: 46,
+                        height: 46,
                         fit: BoxFit.cover,
                         semanticLabel: favorite["semanticLabel"] as String,
                       ),
@@ -119,8 +120,8 @@ class PinnedFavoritesWidget extends StatelessWidget {
                     bottom: 0,
                     right: 0,
                     child: Container(
-                      width: 18,
-                      height: 18,
+                      width: 16,
+                      height: 16,
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primary,
                         shape: BoxShape.circle,
@@ -138,16 +139,19 @@ class PinnedFavoritesWidget extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              favorite["name"] as String,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurface,
-                fontWeight: FontWeight.w500,
+            const SizedBox(height: 2),
+            Flexible(
+              child: Text(
+                favorite["name"] as String,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 11,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
             ),
           ],
         ),

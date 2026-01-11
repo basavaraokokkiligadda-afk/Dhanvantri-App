@@ -13,8 +13,8 @@ class MockMedicines {
       imageUrl: 'https://picsum.photos/200/200?random=1',
       description: 'Pain reliever and fever reducer',
       manufacturer: 'PharmaCo Ltd.',
-      prescriptionRequired: false,
-      inStock: true,
+      requiresPrescription: false,
+      stock: 150,
     ),
     Medicine(
       id: '2',
@@ -24,8 +24,8 @@ class MockMedicines {
       imageUrl: 'https://picsum.photos/200/200?random=2',
       description: 'Antibiotic for bacterial infections',
       manufacturer: 'MediLife Inc.',
-      prescriptionRequired: true,
-      inStock: true,
+      requiresPrescription: true,
+      stock: 85,
     ),
     Medicine(
       id: '3',
@@ -46,8 +46,8 @@ class MockMedicines {
       imageUrl: 'https://picsum.photos/200/200?random=4',
       description: 'Vitamin D supplement for bone health',
       manufacturer: 'NutriWell',
-      prescriptionRequired: false,
-      inStock: true,
+      requiresPrescription: false,
+      stock: 120,
     ),
     Medicine(
       id: '5',
@@ -57,8 +57,8 @@ class MockMedicines {
       imageUrl: 'https://picsum.photos/200/200?random=5',
       description: 'Relieves dry and irritated eyes',
       manufacturer: 'VisionCare',
-      prescriptionRequired: false,
-      inStock: true,
+      requiresPrescription: false,
+      stock: 75,
     ),
     Medicine(
       id: '6',
@@ -68,8 +68,8 @@ class MockMedicines {
       imageUrl: 'https://picsum.photos/200/200?random=6',
       description: 'Topical pain relief for muscles and joints',
       manufacturer: 'PainFree Solutions',
-      prescriptionRequired: false,
-      inStock: false,
+      requiresPrescription: false,
+      stock: 0,
     ),
   ];
 
@@ -97,7 +97,7 @@ class MockMedicines {
     return medicines
         .where((medicine) =>
             medicine.name.toLowerCase().contains(lowerQuery) ||
-            (medicine.description?.toLowerCase().contains(lowerQuery) ?? false));
+            (medicine.description?.toLowerCase().contains(lowerQuery) ?? false))
         .toList();
   }
 }

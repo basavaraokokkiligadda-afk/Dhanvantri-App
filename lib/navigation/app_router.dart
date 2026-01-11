@@ -177,4 +177,12 @@ class AppRouter {
       navigateAndRemoveUntil(context, userDashboard);
     }
   }
+
+  /// Navigate to doctor profile (alias for backward compatibility)
+  static void goToDoctorProfile(
+    BuildContext context,
+    Map<String, dynamic> doctor,
+  ) {
+    navigateToDoctorProfile(context, doctor);
+  }
 }

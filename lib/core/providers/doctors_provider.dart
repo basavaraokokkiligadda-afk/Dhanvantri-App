@@ -45,8 +45,9 @@ class DoctorsProvider extends ChangeNotifier {
     if (specialty == 'All') {
       _filteredDoctors = _doctors;
     } else {
-      _filteredDoctors =
-          _doctors.where((doctor) => doctor.specialty == specialty).toList();
+      _filteredDoctors = _doctors
+          .where((doctor) => doctor.specialization == specialty)
+          .toList();
     }
     notifyListeners();
   }
@@ -60,7 +61,7 @@ class DoctorsProvider extends ChangeNotifier {
       _filteredDoctors = _doctors
           .where((doctor) =>
               doctor.name.toLowerCase().contains(lowerQuery) ||
-              doctor.specialty.toLowerCase().contains(lowerQuery))
+              doctor.specialization.toLowerCase().contains(lowerQuery))
           .toList();
     }
     notifyListeners();
